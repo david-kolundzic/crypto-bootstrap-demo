@@ -1,59 +1,43 @@
-# CryptoBootstrapDemo
+# 📊 Crypto CSV Dashboard – Angular + Bootstrap 5
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.0.
+This is a lightweight MVP demo built with **Angular 20** and **Bootstrap 5**, focused on parsing and previewing large CSV files (e.g. from crypto exchanges).
 
-## Development server
+🎯 Created as a technical showcase for frontend roles – with emphasis on file handling, reactivity, responsive UI and modular structure.
 
-To start a local development server, run:
+---
+
+## ✨ Features
+
+- 📁 CSV file upload (Binance, Bitpanda, etc.)
+- 🧠 Client-side parsing using [PapaParse](https://www.papaparse.com/)
+- 📊 Dynamic preview table (Bootstrap styled)
+- 🔁 Reactive logic (RxJS / optional Signals)
+- 🧼 Simple, clean Angular structure (No backend needed)
+
+---
+
+## 📦 Technologies Used
+
+| Layer        | Stack                      |
+|--------------|----------------------------|
+| Frontend     | Angular 20, Bootstrap 5    |
+| Parsing      | PapaParse (CSV)            |
+| Styling      | SCSS, Bootstrap Components |
+| Language     | TypeScript                 |
+
+---
+
+## 🚀 Live Demo
+
+🧪 Coming soon: [crypto-csv.vercel.app](https://crypto-csv.vercel.app)  
+(or run locally, see below)
+
+---
+
+## 🧪 Run Locally
 
 ```bash
+git clone https://github.com/david-kolundzic/crypto-dashboard-bootstrap-demo.git
+cd crypto-dashboard-bootstrap-demo
+npm install
 ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
