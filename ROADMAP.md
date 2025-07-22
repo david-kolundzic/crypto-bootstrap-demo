@@ -24,7 +24,7 @@ Ticked items are completed, others are in progress or planned.
 ## 🔄 UI Enhancements
 
 - [x] Add loading spinner during file parsing
-- [ ] Display error alert on parsing failure
+- [x] Display error alert on parsing failure
 - [ ] Add upload success notification
 - [ ] Improve mobile/tablet responsiveness
 
@@ -36,6 +36,17 @@ Ticked items are completed, others are in progress or planned.
 - [ ] Progress bar for large file uploads
 - [ ] Modal confirmation before processing
 - [ ] Export parsed data to JSON
+
+---
+
+---
+
+## 📊 Chart Visualization (Planned)
+
+- [ ] Install and configure Chart.js via `ng2-charts`
+- [ ] Create bar chart of total value per coin
+- [ ] (Optional) Add pie chart of coin distribution
+- [ ] Toggle between table and chart views
 
 ---
 

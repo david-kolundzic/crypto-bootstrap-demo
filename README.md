@@ -24,6 +24,8 @@ This is a lightweight MVP demo built with **Angular 20** and **Bootstrap 5**, fo
 | Parsing      | PapaParse (CSV)            |
 | Styling      | SCSS, Bootstrap Components |
 | Language     | TypeScript                 |
+| Visualization | Chart.js 4 (via ng2-charts)       |
+
 
 ---
 
@@ -41,3 +43,11 @@ git clone https://github.com/david-kolundzic/crypto-dashboard-bootstrap-demo.git
 cd crypto-dashboard-bootstrap-demo
 npm install
 ng serve
+
+
+## 🧪 Test CSV Files
+
+Available under `/src/assets/test-data/`:
+
+- `binance-trades.csv`
+- `bitpanda-export.csv`
