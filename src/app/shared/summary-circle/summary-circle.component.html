@@ -1,0 +1,22 @@
+<div class="card shadow-sm w-100 h-100 ratio ratio-1x1 border-4 rounded-circle mx-auto" >
+    <div class="card-body d-grid align-items">
+        <h5 class="card-subtitle text-center text-muted mt-auto">
+            {{ title() }}
+        </h5>        
+        <div class="text-center">          
+            @if (title() === 'Assets') {
+                <h3 class="card-title text-center fw-bold">
+                    {{ totalValue() }}
+                </h3>
+                <span class="text-muted">cryptocurrencies</span>
+            } @else {
+                <h3 class="card-title text-center fw-bold">
+                    ${{ totalValue() | number:'1.2-2' }}
+                </h3>
+                <span [class]="totalChangePercent24h() >= 0 ? 'badge bg-success' : 'badge bg-danger'">
+                    {{ totalChangePercent24h() >= 0 ? '+' : ''}} {{ totalChangePercent24h() | number:'1.2-2' }}%
+                </span>              
+            }
+        </div>        
+    </div>
+</div>

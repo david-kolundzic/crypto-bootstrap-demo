@@ -4,46 +4,58 @@ import { Subscription } from 'rxjs';
 import { LineChartComponent } from '../charts/line-chart/line-chart.component';
 import { PieChartComponent } from '../charts/pie-chart/pie-chart.component';
 import { CsvImportComponent } from '../csv-import/csv-import.component';
-import { CsvImportService, CryptoHolding } from '../../services/csv-import.service';
+import {
+  CsvImportService,
+  CryptoHolding,
+} from '../../services/csv-import.service';
+import { TitleComponent } from '../../shared/title/title.component';
 
 @Component({
   selector: 'app-portfolio',
   standalone: true,
-  imports: [CommonModule, LineChartComponent, PieChartComponent, CsvImportComponent],
+  imports: [
+    CommonModule,
+    LineChartComponent,
+    PieChartComponent,
+    CsvImportComponent,
+    TitleComponent,
+  ],
   templateUrl: './portfolio.component.html',
-  styleUrl: './portfolio.component.scss'
+  styleUrl: './portfolio.component.scss',
 })
 export class PortfolioComponent implements OnInit, OnDestroy {
-  private subscription = new Subscription();
-  
+  titleSignal = signal('Portfolio Dashboard');
+
+  private readonly subscription = new Subscription();
+
   // Default mock data (will be replaced by CSV data if imported)
-  private defaultHoldings: CryptoHolding[] = [
+  private readonly defaultHoldings: CryptoHolding[] = [
     {
       symbol: 'BTC',
       name: 'Bitcoin',
-      price: 67500.00,
+      price: 67500.0,
       holdings: 0.6543,
       value: 44166.25,
       change24h: 1234.56,
-      changePercent24h: 1.86
+      changePercent24h: 1.86,
     },
     {
       symbol: 'ETH',
       name: 'Ethereum',
-      price: 3420.50,
+      price: 3420.5,
       holdings: 5.2341,
       value: 17904.73,
       change24h: 567.89,
-      changePercent24h: 3.28
+      changePercent24h: 3.28,
     },
     {
       symbol: 'ADA',
       name: 'Cardano',
       price: 0.4523,
-      holdings: 12000.00,
-      value: 5427.60,
+      holdings: 12000.0,
+      value: 5427.6,
       change24h: -123.45,
-      changePercent24h: -2.23
+      changePercent24h: -2.23,
     },
     {
       symbol: 'SOL',
@@ -52,27 +64,85 @@ export class PortfolioComponent implements OnInit, OnDestroy {
       holdings: 45.2341,
       value: 6587.23,
       change24h: 234.56,
-      changePercent24h: 3.69
+      changePercent24h: 3.69,
     },
     {
       symbol: 'MATIC',
       name: 'Polygon',
       price: 0.8234,
-      holdings: 8500.00,
-      value: 6998.90,
+      holdings: 8500.0,
+      value: 6998.9,
       change24h: 89.12,
-      changePercent24h: 1.29
-    }
+      changePercent24h: 1.29,
+    },
   ];
-  
+
   holdings = signal<CryptoHolding[]>(this.defaultHoldings);
+
+  allocationData = signal([
+    { name: 'Bitcoin', color: '#F7931A' },
+    { name: 'Ethereum', color: '#627EEA' },
+    { name: 'Cardano', color: '#3468C7' },
+    { name: 'Solana', color: '#9945FF' },
+    { name: 'Polygon', color: '#8247E5' },
+    { name: 'Chainlink', color: '#375BD2' },
+    { name: 'Others', color: '#6C757D' },
+  ]);
+
+  // Chart data for portfolio performance
+  portfolioPerformanceData = signal<number[]>([
+    65000, 68500, 67200, 71000, 69500, 73200, 75800, 74500, 78900, 81200, 79800,
+    82500, 85100, 87300,
+  ]);
+
+  portfolioLabels = signal<string[]>([
+    'Jan 1',
+    'Jan 8',
+    'Jan 15',
+    'Jan 22',
+    'Jan 29',
+    'Feb 5',
+    'Feb 12',
+    'Feb 19',
+    'Feb 26',
+    'Mar 5',
+    'Mar 12',
+    'Mar 19',
+    'Mar 26',
+    'Apr 2',
+  ]);
+
+  // Asset allocation chart data
+  assetAllocationData = signal<number[]>([
+    44166.25, 17904.73, 5427.6, 6587.23, 6998.9, 3200.0, 2500.0,
+  ]);
+
+  assetAllocationLabels = signal<string[]>([
+    'Bitcoin',
+    'Ethereum',
+    'Cardano',
+    'Solana',
+    'Polygon',
+    'Chainlink',
+    'Others',
+  ]);
+
+  assetAllocationColors = signal<string[]>([
+    '#F7931A',
+    '#627EEA',
+    '#3468C7',
+    '#9945FF',
+    '#8247E5',
+    '#375BD2',
+    '#6C757D',
+  ]);
 
   constructor(private csvImportService: CsvImportService) {}
 
   ngOnInit(): void {
-    // Subscribe to CSV import service untuk live updates
+    // Subscribe to CSV import service take live updates
     this.subscription.add(
-      this.csvImportService.holdings$.subscribe(importedHoldings => {
+      this.csvImportService.holdings$.subscribe((importedHoldings) => {
         if (importedHoldings.length > 0) {
           this.holdings.set(importedHoldings);
           this.updateChartData();
@@ -99,11 +169,11 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   private updateChartData(): void {
     // Ažuriraj chart podatke na osnovu novih holdings
     const currentHoldings = this.holdings();
-    
+
     // Ažuriraj asset allocation
-    const allocationData = currentHoldings.map(holding => holding.value);
-    const allocationLabels = currentHoldings.map(holding => holding.name);
-    
+    const allocationData = currentHoldings.map((holding) => holding.value);
+    const allocationLabels = currentHoldings.map((holding) => holding.name);
+
     this.assetAllocationData.set(allocationData);
     this.assetAllocationLabels.set(allocationLabels);
   }
@@ -114,7 +184,10 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   }
 
   getTotalChange24h(): number {
-    return this.holdings().reduce((total, holding) => total + holding.change24h, 0);
+    return this.holdings().reduce(
+      (total, holding) => total + holding.change24h,
+      0
+    );
   }
 
   getTotalChangePercent24h(): number {
@@ -122,39 +195,4 @@ export class PortfolioComponent implements OnInit, OnDestroy {
     const totalChange = this.getTotalChange24h();
     return totalValue > 0 ? (totalChange / totalValue) * 100 : 0;
   }
-  
-  allocationData = signal([
-    { name: 'Bitcoin', color: '#F7931A' },
-    { name: 'Ethereum', color: '#627EEA' },
-    { name: 'Cardano', color: '#3468C7' },
-    { name: 'Solana', color: '#9945FF' },
-    { name: 'Polygon', color: '#8247E5' },
-    { name: 'Chainlink', color: '#375BD2' },
-    { name: 'Others', color: '#6C757D' }
-  ]);
-
-  // Chart data for portfolio performance
-  portfolioPerformanceData = signal<number[]>([
-    65000, 68500, 67200, 71000, 69500, 73200, 75800, 
-    74500, 78900, 81200, 79800, 82500, 85100, 87300
-  ]);
-
-  portfolioLabels = signal<string[]>([
-    'Jan 1', 'Jan 8', 'Jan 15', 'Jan 22', 'Jan 29', 
-    'Feb 5', 'Feb 12', 'Feb 19', 'Feb 26', 'Mar 5', 
-    'Mar 12', 'Mar 19', 'Mar 26', 'Apr 2'
-  ]);
-
-  // Asset allocation chart data
-  assetAllocationData = signal<number[]>([
-    44166.25, 17904.73, 5427.60, 6587.23, 6998.90, 3200.00, 2500.00
-  ]);
-
-  assetAllocationLabels = signal<string[]>([
-    'Bitcoin', 'Ethereum', 'Cardano', 'Solana', 'Polygon', 'Chainlink', 'Others'
-  ]);
-
-  assetAllocationColors = signal<string[]>([
-    '#F7931A', '#627EEA', '#3468C7', '#9945FF', '#8247E5', '#375BD2', '#6C757D'
-  ]);
 }

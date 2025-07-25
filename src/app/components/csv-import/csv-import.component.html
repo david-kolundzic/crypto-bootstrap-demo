@@ -1,0 +1,236 @@
+<div class="csv-import-container">
+  <div class="row g-4">
+    
+    <!-- ✅ Compact information about supported formats -->
+    <div class="col-lg-6 order-lg-2">
+      <div class="alert alert-info border-0">
+        <h6 class="alert-heading mb-2">
+          <i class="bi bi-info-circle me-2"></i>Supported Crypto Exchanges
+        </h6>
+        <div class="row g-2">
+          <div class="col-md-4">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-currency-bitcoin text-warning me-2"></i>
+              <span><strong>Binance</strong> - Spot i Futures</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-gem text-primary me-2"></i>
+              <span><strong>Bitpanda</strong> - EU platforma</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-shield-check text-success me-2"></i>
+              <span><strong>Coinbase</strong> - US burza</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-bank text-info me-2"></i>
+              <span><strong>Kraken</strong> - Pro trading</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-globe text-purple me-2"></i>
+              <span><strong>KuCoin</strong> - Global</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-file-earmark-spreadsheet text-secondary me-2"></i>
+              <span><strong>Vlastiti CSV</strong> - Bilo koji</span>
+            </div>
+          </div>
+        </div>
+        <hr class="my-2">
+        <small class="text-muted">
+          <i class="bi bi-magic me-1"></i>Automatic detection - simply upload your CSV file!
+        </small>
+      </div>
+    </div>
+
+    <!-- Import Mode Selection -->
+    <div class="col-lg-6 order-lg-1">
+      <div class="card border-0">
+        <div class="card-body">
+          
+          <!-- Mode Selection -->
+          <div class="mb-4">
+            <h6 class="card-title mb-3">
+              <i class="bi bi-gear me-2"></i>Import Method
+            </h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="form-check border rounded p-3"
+                     [class.border-primary]="mergeMode()"
+                     [class.bg-light]="mergeMode()">
+                  <input class="form-check-input" 
+                         type="radio" 
+                         name="importMode" 
+                         id="mergeMode"
+                         [checked]="mergeMode()"
+                         (change)="mergeMode.set(true)">
+                  <label class="form-check-label fw-bold" for="mergeMode">
+                    <i class="bi bi-plus-circle text-success me-2"></i>Add to existing portfolio
+                  </label>
+                  <div class="text-muted small mt-1">
+                    New CSV data is merged with existing holdings
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check border rounded p-3"
+                     [class.border-warning]="!mergeMode()"
+                     [class.bg-light]="!mergeMode()">
+                  <input class="form-check-input" 
+                         type="radio" 
+                         name="importMode" 
+                         id="replaceMode"
+                         [checked]="!mergeMode()"
+                         (change)="mergeMode.set(false)">
+                  <label class="form-check-label fw-bold" for="replaceMode">
+                    <i class="bi bi-arrow-repeat text-warning me-2"></i>Replace all data
+                  </label>
+                  <div class="text-muted small mt-1">
+                    Clears existing data and imports only new CSV
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- File Upload -->
+          <div class="mb-4">
+            <h6 class="card-title mb-3">
+              <i class="bi bi-upload me-2"></i>Upload CSV File
+            </h6>
+            <div class="border border-2 border-dashed rounded p-4 text-center"
+                 [class.border-primary]="!isImporting() && !isDragging()"
+                 [class.border-secondary]="isImporting()"
+                 [class.border-success]="isDragging()"
+                 [class.bg-light]="isDragging()"
+                 (dragover)="onDragOver($event)"
+                 (dragleave)="onDragLeave($event)"
+                 (drop)="onDrop($event)">
+              <div *ngIf="!isImporting()">
+                <i class="bi bi-cloud-upload fs-1 text-primary mb-3" 
+                   [class.text-success]="isDragging()"></i>
+                <div class="mb-3">
+                  <p class="mb-2" [class.text-success]="isDragging()">
+                    <span *ngIf="!isDragging()">Drag and drop your CSV file here or</span>
+                    <span *ngIf="isDragging()" class="fw-bold">Drop your file here</span>
+                  </p>
+                  <input type="file" 
+                         class="form-control d-none" 
+                         #fileInput
+                         accept=".csv,.txt"
+                         aria-label="CSV file upload"
+                         title="Upload CSV file"
+                         (change)="onFileSelected($event)">
+                  <button type="button" 
+                          class="btn btn-primary"
+                          (click)="fileInput.click()">
+                    <i class="bi bi-folder2-open me-2"></i>Choose File
+                  </button>
+                </div>
+                <small class="text-muted">
+                  Supported formats: .csv, .txt (max 5MB)
+                </small>
+              </div>
+              
+              <div *ngIf="isImporting()" class="text-center">
+                <div class="spinner-border text-primary mb-3" aria-hidden="true">
+                </div>
+                <p class="mb-2">Processing CSV file...</p>
+                <button class="btn btn-outline-danger btn-sm" (click)="cancelImport()">
+                  <i class="bi bi-x-circle me-1"></i>Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <button type="button" 
+                      class="btn btn-outline-primary me-2"
+                      (click)="downloadTemplate()">
+                <i class="bi bi-download me-2"></i>Template
+              </button>
+              <button type="button" 
+                      class="btn btn-outline-secondary"
+                      (click)="exportCsv()"
+                      [disabled]="!hasData()">
+                <i class="bi bi-file-earmark-arrow-down me-2"></i>Export CSV
+              </button>
+            </div>
+            <div *ngIf="hasData()">
+              <div class="d-flex flex-column align-items-start pt-3">
+                <button type="button" 
+                        class="btn btn-danger"
+                        (click)="clearAllData()"
+                        title="⚠️ DANGER: Clear entire portfolio - permanently removes all {{ currentHoldingsCount() }} crypto holdings from memory. This action CANNOT be undone!">
+                  <i class="bi bi-exclamation-triangle me-2"></i>Clear All Cryptos
+                  <span class="badge bg-light text-dark ms-2">{{ currentHoldingsCount() }}</span>
+                </button>
+                <div class="small text-muted mt-1">
+                  <i class="bi bi-shield-exclamation me-1 text-warning"></i>
+                  Permanently deletes all data!
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Import Result with improved messages -->
+    <div class="col-12" *ngIf="importStatus()">
+      <div class="card" 
+           [class.border-success]="importStatus()?.success" 
+           [class.border-danger]="!importStatus()?.success">
+        <div class="card-body">
+          
+          <div *ngIf="importStatus()?.success" class="text-success">
+            <i class="bi bi-check-circle me-2"></i>
+            <strong>{{ successMessage() }}</strong>
+            
+            <!-- ✅ Detailed information about detected exchange -->
+            <div class="mt-2" *ngIf="importStatus()?.exchange && importStatus()?.exchange !== 'cleared'">
+              <div class="row align-items-center">
+                <div class="col-auto">
+                  <i [class]="getExchangeDisplayInfo(importStatus()?.exchange!).icon" 
+                     class="fs-4 text-primary"></i>
+                </div>
+                <div class="col">
+                  <div class="fw-bold">{{ getExchangeDisplayInfo(importStatus()?.exchange!).name }}</div>
+                  <small class="text-muted">{{ getExchangeDisplayInfo(importStatus()?.exchange!).description }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="!importStatus()?.success" class="text-danger">
+            <i class="bi bi-exclamation-circle me-2"></i>
+            <strong>Import Error</strong>
+            <ul class="mt-2 mb-0">
+              <li *ngFor="let error of importStatus()?.errors">{{ error }}</li>
+            </ul>
+            
+            <!-- ✅ Helpful suggestions for errors -->
+            <div class="mt-2">
+              <small class="text-muted">
+                <i class="bi bi-lightbulb me-1"></i>
+                Please ensure your CSV contains columns: Symbol, Name, Price, Amount/Quantity
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

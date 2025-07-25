@@ -1,0 +1,61 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#">
+          <span class="badge bg-primary rounded-pill me-2">K</span>
+          KryptoApp
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" title="Toggle navigation" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+          <span class="visually-hidden">Toggle navigation</span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav d-flex gap-5 me-auto">
+            
+            <li class="nav-item ms-5">
+              <a class="nav-link" routerLink="/portfolio" routerLinkActive="active">
+                <i class="bi bi-pie-chart me-2"></i>Portfolio
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/trading" routerLinkActive="active">
+                <i class="bi bi-graph-up me-2"></i>Trading
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/market" routerLinkActive="active">
+                <i class="bi bi-currency-bitcoin me-2"></i>Market
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/settings" routerLinkActive="active">
+                <i class="bi bi-gear me-2"></i>Settings
+              </a>
+            </li>
+          </ul>
+          
+          <div class="navbar-nav">
+            <!-- Theme Toggle Button -->
+              <button class="btn btn-link me-2" (click)="toggleTheme()" [title]="currentTheme=='dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'" [attr.aria-label]="currentTheme=='dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'">
+                <span class="visually-hidden">{{ currentTheme=='dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme' }}</span>
+                <i class="bi fs-3 text-light" [ngClass]="currentTheme=='dark' ? 'bi-sun' : 'bi-moon'"></i>
+              </button>
+            <div class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center p-2 me-2" >
+                  <span class="text-white fw-bold">JD</span>
+                </div>
+                JOHN DOE
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#">Profile</a></li>
+                <li><a class="dropdown-item" href="#">Account</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#">Logout</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>

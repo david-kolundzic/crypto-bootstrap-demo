@@ -7,7 +7,36 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "scss"
+          "type": "component",
+          "style": "scss",
+          "skipTests": true,
+          "flat": false,
+          "standalone": true,
+          "inlineTemplate": false,
+          "inlineStyle": false
+        },
+        "@schematics/angular:service": {
+          "flat": false,
+          "skipTests": true,
+          "type": "service"
+        },
+        "@schematics/angular:pipe": {
+          
+          "skipTests": true
+        },
+        "@schematics/angular:directive": {
+          "type": "directive",
+          "skipTests": true
+        },
+        "@schematics/angular:guard": {
+        
+          "skipTests": true
+        },
+        "@schematics/angular:interceptor": {
+          "skipTests": true
+        },
+        "@schematics/angular:resolver": {
+          "skipTests": true
         }
       },
       "root": "",
@@ -31,7 +60,12 @@
             ],
             "styles": [
               "src/styles.scss"
-            ]
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "node_modules"
+              ]
+            }
           },
           "configurations": {
             "production": {
@@ -59,6 +93,7 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          
           "configurations": {
             "production": {
               "buildTarget": "crypto-bootstrap-demo:build:production"
@@ -96,6 +131,30 @@
     }
   },
   "cli": {
-    "analytics": "a6f491bf-1a1b-4c18-975e-eac9275edd7b"
+    "analytics": "a6f491bf-1a1b-4c18-975e-eac9275edd7b",
+    "schematicCollections": ["@schematics/angular"]
+  },
+  "schematics": {
+    "@schematics/angular:component": {
+      "style": "scss",
+      "skipTests": true,
+      "flat": false,
+      "standalone": true,
+      "inlineTemplate": false,
+      "inlineStyle": false
+    },
+    "@schematics/angular:service": {
+      "flat": false,
+      "skipTests": true
+    },
+    "@schematics/angular:pipe": {
+      "skipTests": true
+    },
+    "@schematics/angular:directive": {
+      "skipTests": true
+    },
+    "@schematics/angular:guard": {
+      "skipTests": true
+    }
   }
 }

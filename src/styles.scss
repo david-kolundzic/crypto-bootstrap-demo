@@ -1,1 +1,46 @@
 /* You can add global styles to this file, and also import other style files */
+
+// Use modern Sass @use directive instead of deprecated @import
+@use 'bootstrap/scss/bootstrap';
+@use 'bootstrap-icons/font/bootstrap-icons';
+
+
+
+[data-bs-theme=dark] {
+  --bs-body-bg: #212529 !important;      // Dark background
+  --bs-body-color: #ffffff !important;   // White text
+//   --bs-light-bg: var(--bs-dark) !important; // Dark gray background for light elements
+
+.bg-light {
+    background-color: var(--bs-light-bg) !important;
+    color: var(--bs-light-color) !important;
+}
+
+
+/* Text colors */
+.text-muted {
+    color: var(--bs-secondary-color) !important;
+}
+}
+// 
+.card-header{
+    transition: all 0.3s ease;
+    background-color: var(--bs-white-bg) !important;
+}
+.table-light {
+    --bs-table-bg: var(--bs-light-bg) !important;
+    --bs-table-color: var(--bs-light-color) !important;
+    background-color: var(--bs-light-bg);
+    color: var(--bs-light-color) !important;
+}
+
+/* General improvements for smooth transitions */
+.bg-light,
+.card-header,
+.table-light,
+.form-control,
+.form-select,
+.badge,
+.alert {
+  transition: all 0.3s ease;
+}

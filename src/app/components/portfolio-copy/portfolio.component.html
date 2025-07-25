@@ -1,56 +1,43 @@
     <div class="container-fluid py-4">
       <app-title [title]="titleSignal"></app-title>
       
-      <!-- Loading and Error States -->
-      @if (isLoadingDefaultData()) {
-        <div class="row mb-4">
-          <div class="col-12">
-            <div class="alert alert-info d-flex align-items-center" role="alert">
-              <div class="spinner-border spinner-border-sm me-2" aria-hidden="true"></div>
-              Loading default portfolio data...
-            </div>
-          </div>
-        </div>
-      }
-      
-      @if (defaultDataError()) {
-        <div class="row mb-4">
-          <div class="col-12">
-            <div class="alert alert-warning" role="alert">
-              <strong>Warning:</strong> {{ defaultDataError() }}. Using fallback data.
-            </div>
-          </div>
-        </div>
-      }
-      
       <!-- Summary Cards -->
-      <div class="row mb-4 justify-content-center g-5">
-
-        <div class="col-sm-4 p-0 col-xl-2 mb-3">
-          <app-summary-circle 
-            title="Total Holdings" 
-            [totalValue]="totalPOrtfolioValueSignal()"
-            
-            [totalChangePercent24h]="totalChangePercent24hSignal()"
-          ></app-summary-circle>
+      <div class="row mb-4">
+        <div class="col-md-4 mb-3 ">
+          <div class="card border-0 shadow-sm h-100 p-3">
+            <div class="card-body">
+              <h6 class="card-subtitle mb-2 text-muted">Total Portfolio Value</h6>
+              <h3 class="card-title mb-1 fw-bold">${{ getTotalPortfolioValue() | number:'1.2-2' }}</h3>
+              <span [class]="getTotalChangePercent24h() >= 0 ? 'badge bg-success' : 'badge bg-danger'">
+                {{ getTotalChangePercent24h() >= 0 ? '+' : '' }}{{ getTotalChangePercent24h() | number:'1.2-2' }}%
+              </span>
+            </div>
+          </div>
         </div>
-      <!--  -->
         
-        <div class="col-sm-4 p-0 col-xl-2 mb-3">
-          <app-summary-circle 
-            title="24h P&L" 
-            [totalValue]="totalChange24hSignal()"            
-            [totalChangePercent24h]="totalChangePercent24hSignal()"
-          ></app-summary-circle>
+        <div class="col-md-4 mb-3">
+          <div class="card border-0 shadow-sm h-100 p-3">
+            <div class="card-body">
+              <h6 class="card-subtitle mb-2 text-muted">24h P&L</h6>
+              <h3 class="card-title mb-1 fw-bold">${{ getTotalChange24h() | number:'1.2-2' }}</h3>
+              <span [class]="getTotalChange24h() >= 0 ? 'badge bg-success' : 'badge bg-danger'">
+                {{ getTotalChange24h() >= 0 ? '+' : '' }}{{ getTotalChangePercent24h() | number:'1.2-2' }}%
+              </span>
+            </div>
+          </div>
         </div>
-        <div class="col-sm-4 p-0 col-xl-2 mb-3">
-          <app-summary-circle 
-            title="Assets" 
-            [totalValue]="holdings().length"            
-            [totalChangePercent24h]="totalChangePercent24hSignal()"
-          ></app-summary-circle>
+        
+        <div class="col-md-4 mb-3">
+          <div class="card border-0 shadow-sm h-100 p-3">
+            <div class="card-body">
+              <h6 class="card-subtitle mb-2 text-muted">Assets</h6>
+              <h3 class="card-title mb-1 fw-bold">{{ holdings().length }}</h3>
+              <span class="text-muted">cryptocurrencies</span>
+            </div>
+          </div>
         </div>
       </div>
+      
       <!-- CSV Import Section -->
       <div class="row mb-4">
         <div class="col-12">
@@ -94,8 +81,15 @@
                 [data]="assetAllocationData()"
                 [labels]="assetAllocationLabels()"
                 [colors]="assetAllocationColors()">
-              </app-pie-chart>              
+              </app-pie-chart>
               
+              <!-- Legend -->
+              <!-- <div class="mt-3">
+                <div class="d-flex align-items-center mb-2" *ngFor="let asset of allocationData()">
+                  <div class="rounded-circle me-2 legend-dot" [style.background-color]="asset.color"></div>
+                  <span class="small">{{ asset.name }}</span>
+                </div>
+              </div> -->
             </div>
           </div>
         </div>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exchange CSV Parsing Test</title>
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        .test-section { 
+            margin: 20px 0; 
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+        }
+        .result { 
+            background: #f5f5f5; 
+            padding: 10px; 
+            border-radius: 3px; 
+            margin-top: 10px; 
+        }
+        .success { background: #d4edda; }
+        .error { background: #f8d7da; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 10px; 
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 8px; 
+            text-align: left; 
+        }
+        th { background: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <h1>Exchange CSV Parsing Test</h1>
+    <p>This page tests the exchange detection and parsing functionality.</p>
+
+    <div class="test-section">
+        <h2>Test Binance CSV</h2>
+        <button onclick="testBinance()">Test Binance Format</button>
+        <div id="binance-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Bitpanda CSV</h2>
+        <button onclick="testBitpanda()">Test Bitpanda Format</button>
+        <div id="bitpanda-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Coinbase CSV</h2>
+        <button onclick="testCoinbase()">Test Coinbase Format</button>
+        <div id="coinbase-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Kraken CSV</h2>
+        <button onclick="testKraken()">Test Kraken Format</button>
+        <div id="kraken-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test KuCoin CSV</h2>
+        <button onclick="testKucoin()">Test KuCoin Format</button>
+        <div id="kucoin-result" class="result"></div>
+    </div>
+
+    <script>
+        // Exchange detection patterns
+        const exchangePatterns = {
+            binance: ['Date(UTC)', 'Pair', 'Side', 'Price', 'Executed', 'Amount', 'Fee'],
+            bitpanda: ['Transaction ID', 'Timestamp', 'Transaction Type', 'In/Out', 'Amount Fiat', 'Fiat', 'Amount Asset', 'Asset'],
+            coinbase: ['Timestamp', 'Transaction Type', 'Asset', 'Quantity Transacted', 'EUR Spot Price at Transaction'],
+            kraken: ['txid', 'ordertxid', 'pair', 'time', 'type', 'ordertype', 'price', 'cost', 'fee', 'vol'],
+            kucoin: ['UID', 'Account Type', 'Order ID', 'Symbol', 'Deal Price', 'Deal Value', 'Deal Volume', 'Direction']
+        };
+
+        function detectExchange(headers) {
+            for (const [exchange, pattern] of Object.entries(exchangePatterns)) {
+                const matches = pattern.filter(col => 
+                    headers.some(header => 
+                        header.toLowerCase().includes(col.toLowerCase()) || 
+                        col.toLowerCase().includes(header.toLowerCase())
+                    )
+                );
+                
+                if (matches.length >= Math.ceil(pattern.length * 0.6)) {
+                    return exchange;
+                }
+            }
+            return 'unknown';
+        }
+
+        function displayResult(elementId, exchange, data, headers) {
+            const element = document.getElementById(elementId);
+            const detectedExchange = detectExchange(headers);
+            
+            let html = `<h3>Detection Result</h3>`;
+            html += `<p><strong>Expected:</strong> ${exchange}</p>`;
+            html += `<p><strong>Detected:</strong> ${detectedExchange}</p>`;
+            html += `<p><strong>Status:</strong> <span class="${detectedExchange === exchange ? 'success' : 'error'}">${detectedExchange === exchange ? '✅ Correct' : '❌ Incorrect'}</span></p>`;
+            
+            html += `<h4>Headers Found:</h4>`;
+            html += `<ul><li>${headers.join('</li><li>')}</li></ul>`;
+            
+            html += `<h4>Sample Data (first 3 rows):</h4>`;
+            if (data.length > 0) {
+                html += `<table><thead><tr>`;
+                headers.forEach(header => html += `<th>${header}</th>`);
+                html += `</tr></thead><tbody>`;
+                
+                data.slice(0, 3).forEach(row => {
+                    html += `<tr>`;
+                    headers.forEach(header => html += `<td>${row[header] || ''}</td>`);
+                    html += `</tr>`;
+                });
+                html += `</tbody></table>`;
+            }
+            
+            element.innerHTML = html;
+            element.className = `result ${detectedExchange === exchange ? 'success' : 'error'}`;
+        }
+
+        function testBinance() {
+            const csvData = `Date(UTC),Pair,Side,Price,Executed,Amount,Fee
+2024-07-15 14:23:12,BTCEUR,BUY,9235.45,9235.45,0.15432100,0.00015432 BTC
+2024-07-14 18:45:33,ETHEUR,SELL,2387.50,1193.75,0.50000000,1.19375 EUR
+2024-07-13 09:12:45,BTCEUR,BUY,9150.00,915.00,0.10000000,0.00010000 BTC`;
+
+            Papa.parse(csvData, {
+                header: true,
+                complete: function(results) {
+                    const headers = Object.keys(results.data[0]);
+                    displayResult('binance-result', 'binance', results.data, headers);
+                }
+            });
+        }
+
+        function testBitpanda() {
+            const csvData = `Transaction ID,Timestamp,Transaction Type,In/Out,Amount Fiat,Fiat,Amount Asset,Asset,Asset market price,Asset market price currency,Fee amount,Fee asset,Spread amount,Spread asset
+1a2b3c4d-5e6f-7890-1234-567890abcdef,2024-07-15 14:23:12,Buy,In,1439.70,EUR,0.15432100,BTC,9235.45,EUR,14.47,EUR,0,EUR
+2b3c4d5e-6f78-9012-3456-7890abcdef12,2024-07-14 18:45:33,Sell,Out,1181.36,EUR,0.50000000,ETH,2387.50,EUR,12.39,EUR,0,EUR`;
+
+            Papa.parse(csvData, {
+                header: true,
+                complete: function(results) {
+                    const headers = Object.keys(results.data[0]);
+                    displayResult('bitpanda-result', 'bitpanda', results.data, headers);
+                }
+            });
+        }
+
+        function testCoinbase() {
+            const csvData = `Timestamp,Transaction Type,Asset,Quantity Transacted,EUR Spot Price at Transaction,EUR Subtotal,EUR Total (inclusive of fees),EUR Fees,Notes
+2024-07-15T14:23:12Z,Buy,BTC,0.15432100,9235.45,1425.23,1439.70,14.47,Bought 0.15432100 BTC for €1439.70 EUR
+2024-07-14T18:45:33Z,Sell,ETH,0.50000000,2387.50,1193.75,1181.36,12.39,Sold 0.50000000 ETH for €1181.36 EUR`;
+
+            Papa.parse(csvData, {
+                header: true,
+                complete: function(results) {
+                    const headers = Object.keys(results.data[0]);
+                    displayResult('coinbase-result', 'coinbase', results.data, headers);
+                }
+            });
+        }
+
+        function testKraken() {
+            const csvData = `"txid","ordertxid","pair","time","type","ordertype","price","cost","fee","vol","margin","misc","ledgers"
+"TKH2SE-M7IF5-CFI7LT","","XXBTZEUR","2024-07-15 14:23:12","buy","market","","9235.45","18.47","0.15432100","","",""
+"TFKW4R-JDIF8-XFG8ST","","XETHZEUR","2024-07-14 18:45:33","sell","limit","2387.50","1193.75","2.39","0.50000000","","",""`;
+
+            Papa.parse(csvData, {
+                header: true,
+                complete: function(results) {
+                    const headers = Object.keys(results.data[0]);
+                    displayResult('kraken-result', 'kraken', results.data, headers);
+                }
+            });
+        }
+
+        function testKucoin() {
+            const csvData = `UID,Account Type,Order ID,Symbol,Deal Price,Deal Value,Deal Volume,Direction,Created Date,Fee,feeCurrency,orderType,side,status
+123456789,trade,64b5f2e8a1b2c3d4e5f67890,BTC-EUR,9235.45,1425.23,0.15432100,BUY,2024-07-15 14:23:12,1.4252,EUR,market,buy,done
+123456789,trade,64b5f2e8a1b2c3d4e5f67891,ETH-EUR,2387.50,1193.75,0.50000000,SELL,2024-07-14 18:45:33,0.005,ETH,limit,sell,done`;
+
+            Papa.parse(csvData, {
+                header: true,
+                complete: function(results) {
+                    const headers = Object.keys(results.data[0]);
+                    displayResult('kucoin-result', 'kucoin', results.data, headers);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+.card {
+  transition: all 0.3s ease;
+}
+
+// Summary circle component styles
+.align-items {
+    display: grid;
+    grid-template-rows: 1fr auto 1fr;
+
+  }
+
+  .rounded-circle {
+   max-height: 200px;
+    max-width: 200px;
+  }

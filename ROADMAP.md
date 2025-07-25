@@ -43,8 +43,8 @@ Ticked items are completed, others are in progress or planned.
 
 ## 📊 Chart Visualization (Planned)
 
-- [ ] Install and configure Chart.js via `ng2-charts`
-- [ ] Create bar chart of total value per coin
+- [x] Install and configure Chart.js via `ng2-charts`
+- [x] Create bar chart of total value per coin
 - [ ] (Optional) Add pie chart of coin distribution
 - [ ] Toggle between table and chart views
 

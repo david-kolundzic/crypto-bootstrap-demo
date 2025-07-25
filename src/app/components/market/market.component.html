@@ -1,0 +1,279 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <app-title [title]="titleSignal"></app-title>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary btn-sm">Watchlist</button>
+      <button class="btn btn-outline-secondary btn-sm">Favorites</button>
+    </div>
+  </div>
+
+  <!-- Market Stats -->
+  <div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center">
+          <h6 class="card-subtitle mb-2 text-muted">Market Cap</h6>
+          <h4 class="card-title mb-1 fw-bold">$2.1T</h4>
+          <span class="badge bg-success">+3.21%</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center">
+          <h6 class="card-subtitle mb-2 text-muted">24h Volume</h6>
+          <h4 class="card-title mb-1 fw-bold">$89.2B</h4>
+          <span class="badge bg-danger">-1.23%</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center">
+          <h6 class="card-subtitle mb-2 text-muted">BTC Dominance</h6>
+          <h4 class="card-title mb-1 fw-bold">43.2%</h4>
+          <span class="badge bg-success">+0.15%</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center">
+          <h6 class="card-subtitle mb-2 text-muted">Active Cryptos</h6>
+          <h4 class="card-title mb-1 fw-bold">9,842</h4>
+          <span class="text-muted">+12</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-search"></i>
+                </span>
+                <input type="text" class="form-control" placeholder="Search cryptocurrencies...">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="d-flex gap-2 justify-content-md-end mt-2 mt-md-0">
+                <select class="form-select" aria-label="Filter by category">
+                  <option>All Categories</option>
+                  <option>DeFi</option>
+                  <option>Layer 1</option>
+                  <option>Meme Coins</option>
+                </select>
+                <select class="form-select" aria-label="Sort by">
+                  <option>Market Cap</option>
+                  <option>Price</option>
+                  <option>24h Change</option>
+                  <option>Volume</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cryptocurrency Table -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header border-0">
+          <h5 class="card-title mb-0">Cryptocurrency Prices</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="border-0 ps-4">#</th>
+                  <th class="border-0">Name</th>
+                  <th class="border-0">Price</th>
+                  <th class="border-0">24h %</th>
+                  <th class="border-0">7d %</th>
+                  <th class="border-0">Market Cap</th>
+                  <th class="border-0">Volume (24h)</th>
+                  <th class="border-0">Circulating Supply</th>
+                  <th class="border-0">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Example rows, replace with *ngFor for dynamic data -->
+                <tr>
+                  <td class="ps-4 py-3">1</td>
+                  <td class="py-3">
+                    <div class="d-flex align-items-center">
+                      <div class="bg-warning rounded-circle me-2 d-flex align-items-center justify-content-center" >
+                        <i class="bi bi-currency-bitcoin text-white"></i>
+                      </div>
+                      <div>
+                        <div class="fw-bold">Bitcoin</div>
+                        <small class="text-muted">BTC</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-3"><strong>$67,500.00</strong></td>
+                  <td class="py-3"><span class="text-success fw-bold">+1.86%</span></td>
+                  <td class="py-3"><span class="text-success fw-bold">+5.23%</span></td>
+                  <td class="py-3">$1.32T</td>
+                  <td class="py-3">$28.5B</td>
+                  <td class="py-3">19.6M BTC</td>
+                  <td class="py-3">
+                    <div class="btn-group btn-group-sm">
+                      <button class="btn btn-outline-primary" title="Trade">Trade</button>
+                      <button class="btn btn-outline-secondary" title="Add to favorites">
+                        <i class="bi bi-star"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="ps-4 py-3">2</td>
+                  <td class="py-3">
+                    <div class="d-flex align-items-center">
+                      <div class="bg-primary rounded-circle me-2 d-flex align-items-center justify-content-center" >
+                        <i class="bi bi-currency-ethereum text-white"></i>
+                      </div>
+                      <div>
+                        <div class="fw-bold">Ethereum</div>
+                        <small class="text-muted">ETH</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-3"><strong>$3,420.50</strong></td>
+                  <td class="py-3"><span class="text-success fw-bold">+2.34%</span></td>
+                  <td class="py-3"><span class="text-success fw-bold">+8.91%</span></td>
+                  <td class="py-3">$411.2B</td>
+                  <td class="py-3">$15.8B</td>
+                  <td class="py-3">120.3M ETH</td>
+                  <td class="py-3">
+                    <div class="btn-group btn-group-sm">
+                      <button class="btn btn-outline-primary">Trade</button>
+                      <button class="btn btn-outline-secondary" title="Add to favorites">
+                        <i class="bi bi-star"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="ps-4 py-3">3</td>
+                  <td class="py-3">
+                    <div class="d-flex align-items-center">
+                      <div class="bg-info rounded-circle me-2 d-flex align-items-center justify-content-center" >
+                        <span class="text-white fw-bold small">BNB</span>
+                      </div>
+                      <div>
+                        <div class="fw-bold">BNB</div>
+                        <small class="text-muted">BNB</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-3"><strong>$634.21</strong></td>
+                  <td class="py-3"><span class="text-danger fw-bold">-0.87%</span></td>
+                  <td class="py-3"><span class="text-success fw-bold">+3.45%</span></td>
+                  <td class="py-3">$94.7B</td>
+                  <td class="py-3">$1.2B</td>
+                  <td class="py-3">149.5M BNB</td>
+                  <td class="py-3">
+                    <div class="btn-group btn-group-sm">
+                      <button class="btn btn-outline-primary">Trade</button>
+                      <button class="btn btn-outline-secondary" title="Add to favorites">
+                        <i class="bi bi-star"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="ps-4 py-3">4</td>
+                  <td class="py-3">
+                    <div class="d-flex align-items-center">
+                      <div class="bg-success rounded-circle me-2 d-flex align-items-center justify-content-center" >
+                        <span class="text-white fw-bold small">SOL</span>
+                      </div>
+                      <div>
+                        <div class="fw-bold">Solana</div>
+                        <small class="text-muted">SOL</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-3"><strong>$145.67</strong></td>
+                  <td class="py-3"><span class="text-success fw-bold">+4.23%</span></td>
+                  <td class="py-3"><span class="text-success fw-bold">+12.56%</span></td>
+                  <td class="py-3">$67.8B</td>
+                  <td class="py-3">$2.1B</td>
+                  <td class="py-3">465.7M SOL</td>
+                  <td class="py-3">
+                    <div class="btn-group btn-group-sm">
+                      <button class="btn btn-outline-primary" title="Trade">Trade</button>
+                      <button class="btn btn-outline-secondary" title="Add to favorites">
+                        <i class="bi bi-star"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="ps-4 py-3">5</td>
+                  <td class="py-3">
+                    <div class="d-flex align-items-center">
+                      <div class="bg-secondary rounded-circle me-2 d-flex align-items-center justify-content-center" >
+                        <span class="text-white fw-bold small">ADA</span>
+                      </div>
+                      <div>
+                        <div class="fw-bold">Cardano</div>
+                        <small class="text-muted">ADA</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-3"><strong>$0.4523</strong></td>
+                  <td class="py-3"><span class="text-danger fw-bold">-1.34%</span></td>
+                  <td class="py-3"><span class="text-danger fw-bold">-2.78%</span></td>
+                  <td class="py-3">$15.9B</td>
+                  <td class="py-3">$456M</td>
+                  <td class="py-3">35.2B ADA</td>
+                  <td class="py-3">
+                    <div class="btn-group btn-group-sm">
+                      <button class="btn btn-outline-primary">Trade</button>
+                      <button class="btn btn-outline-secondary" title="Add to favorites">
+                        <i class="bi bi-star"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer border-0">
+          <nav>
+            <ul class="pagination justify-content-center mb-0">
+              <li class="page-item disabled">
+                <a class="page-link" href="#">Previous</a>
+              </li>
+              <li class="page-item active">
+                <a class="page-link" href="#">1</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">2</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">3</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">Next</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

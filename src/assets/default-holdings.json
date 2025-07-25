@@ -1,0 +1,65 @@
+[
+  {
+    "symbol": "BTC",
+    "name": "Bitcoin",
+    "price": 67500.0,
+    "holdings": 0.6543,
+    "value": 44166.25,
+    "change24h": 1234.56,
+    "changePercent24h": 1.86
+  },
+  {
+    "symbol": "ETH",
+    "name": "Ethereum",
+    "price": 3420.5,
+    "holdings": 5.2341,
+    "value": 17904.73,
+    "change24h": 567.89,
+    "changePercent24h": 3.28
+  },
+  {
+    "symbol": "ADA",
+    "name": "Cardano",
+    "price": 0.4523,
+    "holdings": 12000.0,
+    "value": 5427.6,
+    "change24h": -123.45,
+    "changePercent24h": -2.23
+  },
+  {
+    "symbol": "SOL",
+    "name": "Solana",
+    "price": 145.67,
+    "holdings": 45.2341,
+    "value": 6587.23,
+    "change24h": 234.56,
+    "changePercent24h": 3.69
+  },
+  {
+    "symbol": "MATIC",
+    "name": "Polygon",
+    "price": 0.8234,
+    "holdings": 8500.0,
+    "value": 6998.9,
+    "change24h": 89.12,
+    "changePercent24h": 1.29
+  },
+  {
+    "symbol": "LINK",
+    "name": "Chainlink",
+    "price": 15.67,
+    "holdings": 204.23,
+    "value": 3200.28,
+    "change24h": 45.12,
+    "changePercent24h": 1.43
+  },
+  {
+    "symbol": "DOT",
+    "name": "Polkadot",
+    "price": 6.45,
+    "holdings": 387.6,
+    "value": 2500.02,
+    "change24h": -23.45,
+    "changePercent24h": -0.93
+  }
+]
