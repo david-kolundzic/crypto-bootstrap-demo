@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, input, computed } from '@angular/core';
 import { ChartConfiguration, ChartOptions, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 
@@ -10,7 +10,7 @@ import { BaseChartDirective } from 'ng2-charts';
     <div class="chart-container">
       <canvas
         baseChart
-        [data]="lineChartData"
+        [data]="lineChartData()"
         [options]="lineChartOptions"
         type="line"
         class="chart">
@@ -28,20 +28,32 @@ import { BaseChartDirective } from 'ng2-charts';
     }
   `]
 })
-export class LineChartComponent implements OnInit {
-  @Input() data: number[] = [];
-  @Input() labels: string[] = [];
-  @Input() label: string = 'Portfolio Value';
-  @Input() borderColor: string = '#0d6efd';
-  @Input() backgroundColor: string = 'rgba(13, 110, 253, 0.1)';
+export class LineChartComponent {
+  // ✅ Angular 20 - Modern input signals
+  readonly data = input<number[]>([]);
+  readonly labels = input<string[]>([]);
+  readonly label = input<string>('Portfolio Value');
+  readonly borderColor = input<string>('#0d6efd');
+  readonly backgroundColor = input<string>('rgba(13, 110, 253, 0.1)');
 
-  public lineChartType: ChartType = 'line';
-  public lineChartData: ChartConfiguration<'line'>['data'] = {
-    labels: [],
-    datasets: []
-  };
+  // ✅ Angular 20 - Static chart configuration
+  public readonly lineChartType: ChartType = 'line';
 
-  public lineChartOptions: ChartOptions<'line'> = {
+  // ✅ Angular 20 - Computed signal for reactive chart data
+  readonly lineChartData = computed((): ChartConfiguration<'line'>['data'] => ({
+    labels: this.labels(),
+    datasets: [{
+      data: this.data(),
+      label: this.label(),
+      borderColor: this.borderColor(),
+      backgroundColor: this.backgroundColor(),
+      fill: true,
+      tension: 0.4
+    }]
+  }));
+
+  // ✅ Angular 20 - Static chart options (immutable configuration)
+  public readonly lineChartOptions: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -74,26 +86,4 @@ export class LineChartComponent implements OnInit {
       }
     }
   };
-
-  ngOnInit() {
-    this.updateChart();
-  }
-
-  ngOnChanges() {
-    this.updateChart();
-  }
-
-  private updateChart() {
-    this.lineChartData = {
-      labels: this.labels,
-      datasets: [{
-        data: this.data,
-        label: this.label,
-        borderColor: this.borderColor,
-        backgroundColor: this.backgroundColor,
-        fill: true,
-        tension: 0.4
-      }]
-    };
-  }
 }

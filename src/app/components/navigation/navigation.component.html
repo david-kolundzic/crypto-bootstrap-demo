@@ -37,9 +37,9 @@
           
           <div class="navbar-nav">
             <!-- Theme Toggle Button -->
-              <button class="btn btn-link me-2" (click)="toggleTheme()" [title]="currentTheme=='dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'" [attr.aria-label]="currentTheme=='dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'">
-                <span class="visually-hidden">{{ currentTheme=='dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme' }}</span>
-                <i class="bi fs-3 text-light" [ngClass]="currentTheme=='dark' ? 'bi-sun' : 'bi-moon'"></i>
+              <button class="btn btn-link me-2" (click)="toggleTheme()" [title]="currentTheme()=='dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'" [attr.aria-label]="currentTheme()=='dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'">
+                <span class="visually-hidden">{{ currentTheme()=='dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme' }}</span>
+                <i class="bi fs-3 text-light" [ngClass]="currentTheme()=='dark' ? 'bi-sun' : 'bi-moon'"></i>
               </button>
             <div class="nav-item dropdown">
               <button class="nav-link dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">

@@ -1,6 +1,10 @@
 import { Injectable, computed, Signal } from '@angular/core';
 import { CryptoHolding } from './csv-import.service';
 
+/**
+ * ✅ Angular 20 - Portfolio calculation service using signals and computed values
+ * Handles all portfolio calculations and chart data generation
+ */
 @Injectable({
   providedIn: 'root'
 })

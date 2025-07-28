@@ -17,9 +17,12 @@ export class CsvImportComponent {
   // ✅ Novi output() function umjesto @Output()
   readonly dataImported = output<any[]>();
 
+  // ✅ Output za reset na default holdings
+  readonly resetToDefault = output<void>();
+
   isImporting = signal(false);
   importStatus = signal<ImportResult | null>(null);
-  mergeMode = signal(true); // Novi signal za merge mode
+  mergeMode = signal(false); // Default: Replace portfolio (not merge)
 
   // ✅ Angular 20 computed signal za success poruku
   readonly successMessage = computed(() => {
@@ -149,10 +152,12 @@ export class CsvImportComponent {
         .parseCsvFile(file, this.mergeMode())
         .pipe(
           tap((result) => {
+            console.log('📁 CSV Import Component - mergeMode:', this.mergeMode());
+            console.log('📁 CSV Import Component - result:', result);
             this.importStatus.set(result);
             if (result.success && result.data) {
               this.dataImported.emit(result.data);
-              console.log('✅ CSV import successful:', result.data);
+              console.log('✅ CSV import successful:', result.data.length, 'holdings');
             }
           }),
           finalize(() => {
@@ -259,17 +264,29 @@ export class CsvImportComponent {
       );
 
       if (doubleCheck) {
+        console.log('🔴 Clear All Data: Starting clearance process');
+        console.log('🔴 Clear All Data: Current holdings before clear:', this.csvImportService.holdings().length);
+        
         this.csvImportService.updateHoldings([]);
+        console.log('🔴 Clear All Data: Holdings updated to empty array');
+        console.log('🔴 Clear All Data: Service holdings after clear:', this.csvImportService.holdings().length);
+        
         this.importStatus.set({
           success: true,
           data: [],
           exchange: 'cleared',
         });
+        console.log('🔴 Clear All Data: Import status set to cleared');
 
         // Emit empty data to parent component
         this.dataImported.emit([]);
+        console.log('🔴 Clear All Data: Emitted empty array to parent');
       }
     }
+  }
+
+  resetToDefaultHoldings(): void {
+    this.resetToDefault.emit();
   }
 
   ngOnDestroy(): void {

@@ -1,4 +1,4 @@
-import { Component, Input, signal } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-title',
@@ -7,7 +7,6 @@ import { Component, Input, signal } from '@angular/core';
   styles: ``
 })
 export class TitleComponent {
-  
-  @Input({ required: true }) title = signal<string>('');
-  
+  // ✅ Angular 20 - Modern input signal (required)
+  readonly title = input.required<string>();
 }

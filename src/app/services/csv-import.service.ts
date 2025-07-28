@@ -1,4 +1,4 @@
-import { Injectable, signal, effect } from '@angular/core';
+import { Injectable, signal, effect, computed } from '@angular/core';
 import { catchError, Observable, of, BehaviorSubject } from 'rxjs';
 import * as Papa from 'papaparse';
 
@@ -33,36 +33,65 @@ export interface ExchangeTradeData {
   providedIn: 'root'
 })
 export class CsvImportService {
-  // ✅ Angular 20 signal umjesto BehaviorSubject
+  // ✅ Angular 20 - Primary signal for holdings state
   private readonly holdingsSignal = signal<CryptoHolding[]>([]);
   
-  // ✅ Readonly getter za holdings signal
-  get holdings() {
-    return this.holdingsSignal.asReadonly();
-  }
+  // ✅ Angular 20 - Readonly computed signal for external access
+  readonly holdings = this.holdingsSignal.asReadonly();
 
-  // 🔄 Backward compatibility za Observable (ako je negdje korišten)
+  // ✅ Angular 20 - Computed signals for portfolio statistics
+  readonly totalHoldings = computed(() => this.holdingsSignal().length);
+  readonly totalValue = computed(() => 
+    this.holdingsSignal().reduce((sum, holding) => sum + holding.value, 0)
+  );
+  readonly isEmpty = computed(() => this.holdingsSignal().length === 0);
+  readonly hasHoldings = computed(() => this.holdingsSignal().length > 0);
+
+  // 🔄 Backward compatibility for Observable-based consumers
   private readonly holdingsSubject = new BehaviorSubject<CryptoHolding[]>([]);
-  public holdings$ = this.holdingsSubject.asObservable();
+  readonly holdings$ = this.holdingsSubject.asObservable();
+
+  // ✅ Angular 20 - Computed signals for better UI state management
+  readonly isProcessing = signal<boolean>(false);
+  readonly lastImportResult = signal<ImportResult | null>(null);
+  readonly lastError = signal<string | null>(null);
+
+  // ✅ Angular 20 - Computed signals for UI feedback
+  readonly hasData = computed(() => this.holdingsSignal().length > 0);
+  readonly canExport = computed(() => this.hasData() && !this.isProcessing());
+  readonly statusMessage = computed(() => {
+    if (this.isProcessing()) return 'Processing CSV data...';
+    if (this.lastError()) return this.lastError();
+    if (this.hasData()) return `${this.totalHoldings()} assets loaded`;
+    return 'No data loaded';
+  });
 
   constructor() {
-    // ✅ Sinkronizacija signala sa BehaviorSubject za backward compatibility
+    // ✅ Angular 20 - Sync signal with Observable for backward compatibility
     effect(() => {
       this.holdingsSubject.next(this.holdingsSignal());
     });
   }
 
-  // Exchange detection patterns
+  // ✅ Angular 20 - Exchange detection patterns for different CSV formats
   private readonly exchangePatterns = {
     binance: ['Date(UTC)', 'Pair', 'Side', 'Price', 'Executed', 'Amount', 'Fee'],
     bitpanda: ['Transaction ID', 'Timestamp', 'Transaction Type', 'In/Out', 'Amount Fiat', 'Fiat', 'Amount Asset', 'Asset'],
     coinbase: ['Timestamp', 'Transaction Type', 'Asset', 'Quantity Transacted', 'EUR Spot Price at Transaction'],
-    kraken: ['txid', 'ordertxid', 'pair', 'time', 'type', 'ordertype', 'price', 'cost', 'fee', 'vol'],
-    kucoin: ['UID', 'Account Type', 'Order ID', 'Symbol', 'Deal Price', 'Deal Value', 'Deal Volume', 'Direction']
-  };
+    kraken: ['pair', 'time', 'type', 'price', 'vol'], // Key columns for detection
+    kucoin: ['Symbol', 'Deal Price', 'Deal Volume', 'Direction', 'Created'] // Key columns for detection
+  } as const;
 
-  // Parsiraj CSV fajl
+  /**
+   * Parse CSV file and import holdings data
+   * @param file The CSV file to parse
+   * @param mergeWithExisting Whether to merge with current holdings or replace them
+   * @returns Observable with import result
+   */
   parseCsvFile(file: File, mergeWithExisting: boolean = false): Observable<ImportResult> {
+    this.isProcessing.set(true);
+    this.lastError.set(null);
+    
     return new Observable<ImportResult>((observer) => {
       Papa.parse<any>(file, {
         header: true,
@@ -74,33 +103,60 @@ export class CsvImportService {
             
             if (importResult.success && importResult.data) {
               if (mergeWithExisting) {
+                console.log('🔄 Merging with existing holdings:', {
+                  existing: this.getCurrentHoldings().length,
+                  new: importResult.data.length
+                });
                 const mergedHoldings = this.mergeHoldings(this.getCurrentHoldings(), importResult.data);
+                console.log('🔄 Merged result:', mergedHoldings.length, 'holdings');
                 this.updateHoldings(mergedHoldings);
                 importResult.data = mergedHoldings;
               } else {
+                console.log('🔄 Replacing existing holdings:', {
+                  old: this.getCurrentHoldings().length,
+                  new: importResult.data.length
+                });
                 this.updateHoldings(importResult.data);
               }
+              this.lastImportResult.set(importResult);
+            } else {
+              this.lastError.set(importResult.errors?.[0] || 'Unknown error occurred');
             }
             
+            this.isProcessing.set(false);
             observer.next(importResult);
             observer.complete();
           }  catch (error) {
-            observer.error(new Error(`Error processing file: ${error}`));
+            this.isProcessing.set(false);
+            const errorMessage = `Error processing file: ${error}`;
+            this.lastError.set(errorMessage);
+            observer.error(new Error(errorMessage));
           }
         },
         error: (error: Error) => {
-          observer.error(new Error(`Parse error: ${error.message}`));
+          this.isProcessing.set(false);
+          const errorMessage = `Parse error: ${error.message}`;
+          this.lastError.set(errorMessage);
+          observer.error(new Error(errorMessage));
         }
       });
     }).pipe(
-      catchError(error => of({
-        success: false,
-        errors: [`Error processing file: ${error.message}`]
-      }))
+      catchError(error => {
+        this.isProcessing.set(false);
+        this.lastError.set(error.message);
+        return of({
+          success: false,
+          errors: [`Error processing file: ${error.message}`]
+        });
+      })
     );
   }
 
-  // Parsiraj CSV string koristeći PapaParse
+  /**
+   * Parse CSV string using PapaParse
+   * @param csvString The CSV content as string
+   * @returns Observable with import result
+   */
   parseCsvString(csvString: string): Observable<ImportResult> {
     return new Observable<ImportResult>((observer) => {
       Papa.parse<any>(csvString, {
@@ -267,26 +323,28 @@ export class CsvImportService {
     return isNaN(parsed) ? 0 : parsed;
   }
 
-  // ✅ Ažuriraj holdings podatke sa signal
+  // ✅ Angular 20 - Update holdings signal (primary state management)
   updateHoldings(holdings: CryptoHolding[]): void {
     this.holdingsSignal.set(holdings);
   }
 
-  // Dodaj pojedinačni holding k postojećima
+  // ✅ Angular 20 - Add single holding using signal-based merge
   addHolding(newHolding: CryptoHolding): void {
-    const currentHoldings = this.getCurrentHoldings();
+    const currentHoldings = this.holdingsSignal();
     const mergedHoldings = this.mergeHoldings(currentHoldings, [newHolding]);
-    this.updateHoldings(mergedHoldings);
+    this.holdingsSignal.set(mergedHoldings);
   }
 
-  // Ukloni holding po simbolu
+  // ✅ Angular 20 - Remove holding by symbol using signal update
   removeHolding(symbol: string): void {
-    const currentHoldings = this.getCurrentHoldings();
-    const filteredHoldings = currentHoldings.filter(h => h.symbol.toUpperCase() !== symbol.toUpperCase());
-    this.updateHoldings(filteredHoldings);
+    const currentHoldings = this.holdingsSignal();
+    const filteredHoldings = currentHoldings.filter(h => 
+      h.symbol.toUpperCase() !== symbol.toUpperCase()
+    );
+    this.holdingsSignal.set(filteredHoldings);
   }
 
-  // ✅ Dobij trenutne holdings iz signal
+  // ✅ Angular 20 - Get current holdings from signal
   getCurrentHoldings(): CryptoHolding[] {
     return this.holdingsSignal();
   }
@@ -395,22 +453,45 @@ export class CsvImportService {
     }
 
     const headers = Object.keys(results.data[0]);
+    console.log('🔍 CSV Headers detected:', headers);
+    
+    // Special detection for common exchange patterns
+    const headersLower = headers.map(h => h.toLowerCase());
+    
+    // Kraken specific detection
+    if (headersLower.includes('pair') && headersLower.includes('time') && headersLower.includes('type')) {
+      console.log('✅ Exchange detected: kraken (specific pattern)');
+      return 'kraken';
+    }
+    
+    // KuCoin specific detection
+    if (headersLower.some(h => h.includes('deal')) && headersLower.includes('symbol') && headersLower.includes('direction')) {
+      console.log('✅ Exchange detected: kucoin (specific pattern)');
+      return 'kucoin';
+    }
     
     // Check each exchange pattern
     for (const [exchange, pattern] of Object.entries(this.exchangePatterns)) {
       const matches = pattern.filter(col => 
-        headers.some(header => 
-          header.toLowerCase().includes(col.toLowerCase()) || 
-          col.toLowerCase().includes(header.toLowerCase())
-        )
+        headers.some(header => {
+          const headerLower = header.toLowerCase();
+          const colLower = col.toLowerCase();
+          return headerLower.includes(colLower) || 
+                 colLower.includes(headerLower) ||
+                 headerLower === colLower;
+        })
       );
+      
+      console.log(`🔍 ${exchange} matches:`, matches.length, '/', pattern.length, matches);
       
       // If most columns match, it's likely this exchange
       if (matches.length >= Math.ceil(pattern.length * 0.6)) {
+        console.log(`✅ Exchange detected: ${exchange}`);
         return exchange;
       }
     }
     
+    console.log('❌ No exchange detected, using generic parsing');
     return 'unknown';
   }
 
@@ -507,43 +588,106 @@ export class CsvImportService {
 
   // Parse Kraken CSV format
   private parseKrakenData(data: any[]): ExchangeTradeData[] {
-    return data.map(row => ({
-      symbol: this.extractSymbolFromPair(row['pair']),
-      side: this.normalizeTradeSide(row['type']),
-      quantity: parseFloat(row['vol']) || 0,
-      price: parseFloat(row['price']) || (parseFloat(row['cost']) / parseFloat(row['vol'])) || 0,
-      fee: parseFloat(row['fee']) || 0,
-      timestamp: row['time'],
-      exchange: 'kraken'
-    })).filter(trade => trade.quantity > 0 && trade.price > 0);
+    console.log('🟠 Parsing Kraken data, first row:', data[0]);
+    console.log('🟠 Available columns:', Object.keys(data[0] || {}));
+    
+    return data.map((row, index) => {
+      try {
+        const symbol = this.extractSymbolFromPair(row['pair'] || row['Pair']);
+        const side = this.normalizeTradeSide(row['type'] || row['Type']);
+        const quantity = parseFloat(row['vol'] || row['Vol'] || row['volume'] || row['Volume']) || 0;
+        const price = parseFloat(row['price'] || row['Price']) || (parseFloat(row['cost'] || row['Cost']) / parseFloat(row['vol'] || row['Vol'])) || 0;
+        const fee = parseFloat(row['fee'] || row['Fee']) || 0;
+        const timestamp = row['time'] || row['Time'] || row['timestamp'] || row['Timestamp'];
+        
+        if (index < 3) { // Debug first few rows
+          console.log(`🟠 Kraken row ${index}:`, { symbol, side, quantity, price, fee, timestamp });
+        }
+        
+        return {
+          symbol,
+          side,
+          quantity,
+          price,
+          fee,
+          timestamp,
+          exchange: 'kraken'
+        };
+      } catch (error) {
+        console.error(`❌ Error parsing Kraken row ${index}:`, error, row);
+        return null;
+      }
+    }).filter((trade): trade is ExchangeTradeData => 
+      trade !== null && trade.quantity > 0 && trade.price > 0
+    );
   }
 
   // Parse KuCoin CSV format
   private parseKuCoinData(data: any[]): ExchangeTradeData[] {
-    return data.map(row => ({
-      symbol: this.extractSymbolFromPair(row['Symbol']),
-      side: this.normalizeTradeSide(row['Direction']),
-      quantity: parseFloat(row['Deal Volume']) || 0,
-      price: parseFloat(row['Deal Price']) || 0,
-      fee: parseFloat(row['Fee']) || 0,
-      timestamp: row['Created Date'],
-      exchange: 'kucoin'
-    })).filter(trade => trade.quantity > 0 && trade.price > 0);
+    console.log('🔵 Parsing KuCoin data, first row:', data[0]);
+    console.log('🔵 Available columns:', Object.keys(data[0] || {}));
+    
+    return data.map((row, index) => {
+      try {
+        const symbol = this.extractSymbolFromPair(row['Symbol'] || row['symbol']);
+        const side = this.normalizeTradeSide(row['Direction'] || row['direction'] || row['Side'] || row['side']);
+        const quantity = parseFloat(row['Deal Volume'] || row['deal volume'] || row['Volume'] || row['volume'] || row['Amount'] || row['amount']) || 0;
+        const price = parseFloat(row['Deal Price'] || row['deal price'] || row['Price'] || row['price']) || 0;
+        const fee = parseFloat(row['Fee'] || row['fee']) || 0;
+        const timestamp = row['Created Date'] || row['created date'] || row['Date'] || row['date'] || row['Time'] || row['time'];
+        
+        if (index < 3) { // Debug first few rows
+          console.log(`🔵 KuCoin row ${index}:`, { symbol, side, quantity, price, fee, timestamp });
+        }
+        
+        return {
+          symbol,
+          side,
+          quantity,
+          price,
+          fee,
+          timestamp,
+          exchange: 'kucoin'
+        };
+      } catch (error) {
+        console.error(`❌ Error parsing KuCoin row ${index}:`, error, row);
+        return null;
+      }
+    }).filter((trade): trade is ExchangeTradeData => 
+      trade !== null && trade.quantity > 0 && trade.price > 0
+    );
   }
 
   // Extract symbol from trading pair (e.g., "BTCEUR" -> "BTC")
   private extractSymbolFromPair(pair: string): string {
     if (!pair) return '';
     
-    // Common base currencies to remove
-    const baseCurrencies = ['EUR', 'USD', 'USDT', 'USDC', 'BTC', 'ETH'];
+    pair = pair.toUpperCase().trim();
+    
+    // ✅ Handle separators first (most common and reliable)
+    if (pair.includes('-')) {
+      return pair.split('-')[0];
+    }
+    
+    if (pair.includes('_')) {
+      return pair.split('_')[0];
+    }
+    
+    if (pair.includes('/')) {
+      return pair.split('/')[0];
+    }
+    
+    // ✅ Handle common base currencies (for pairs without separators like "BTCEUR")
+    // Order matters: longer strings first to avoid false matches
+    const baseCurrencies = [
+      'USDT', 'USDC', 'BUSD', // Stablecoins first (longer strings)
+      'EUR', 'USD', 'GBP', 'JPY', // Fiat currencies
+      'BTC', 'ETH', 'BNB'  // Crypto base currencies
+    ];
     
     for (const base of baseCurrencies) {
-      if (pair.endsWith(base)) {
-        return pair.replace(base, '');
-      }
-      if (pair.includes('-')) {
-        return pair.split('-')[0];
+      if (pair.endsWith(base) && pair.length > base.length) {
+        return pair.substring(0, pair.length - base.length);
       }
     }
     
@@ -628,6 +772,13 @@ export class CsvImportService {
 
   // Spoji postojeće holdings s novim podacima
   private mergeHoldings(existingHoldings: CryptoHolding[], newHoldings: CryptoHolding[]): CryptoHolding[] {
+    console.log('🔀 mergeHoldings called:', {
+      existing: existingHoldings.length,
+      new: newHoldings.length,
+      existingSymbols: existingHoldings.map(h => h.symbol),
+      newSymbols: newHoldings.map(h => h.symbol)
+    });
+    
     const mergedMap = new Map<string, CryptoHolding>();
     
     // Dodaj postojeće holdings
@@ -643,6 +794,7 @@ export class CsvImportService {
       if (existing) {
         // Ako kriptovaluta već postoji, dodaj količine i ažuriraj prosječnu cijenu
         const totalHoldings = existing.holdings + newHolding.holdings;
+        console.log(`🔀 Merging ${symbol}: ${existing.holdings} + ${newHolding.holdings} = ${totalHoldings}`);
         
         mergedMap.set(symbol, {
           symbol: symbol,
@@ -655,10 +807,17 @@ export class CsvImportService {
         });
       } else {
         // Ako je nova kriptovaluta, samo je dodaj
+        console.log(`🔀 Adding new ${symbol}: ${newHolding.holdings}`);
         mergedMap.set(symbol, { ...newHolding });
       }
     });
     
-    return Array.from(mergedMap.values()).filter(holding => holding.holdings > 0);
+    const result = Array.from(mergedMap.values()).filter(holding => holding.holdings > 0);
+    console.log('🔀 Merge complete:', {
+      result: result.length,
+      symbols: result.map(h => `${h.symbol}:${h.holdings}`)
+    });
+    
+    return result;
   }
 }

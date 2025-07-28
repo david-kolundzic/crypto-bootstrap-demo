@@ -1,5 +1,5 @@
-    <div class="container-fluid py-4">
-      <app-title [title]="titleSignal"></app-title>
+<div class="container-fluid py-4">
+      <app-title [title]="title"></app-title>
       
       <!-- Loading and Error States -->
       @if (isLoadingDefaultData()) {
@@ -29,8 +29,7 @@
         <div class="col-sm-4 p-0 col-xl-2 mb-3">
           <app-summary-circle 
             title="Total Holdings" 
-            [totalValue]="totalPOrtfolioValueSignal()"
-            
+            [totalValue]="totalPortfolioValueSignal()"
             [totalChangePercent24h]="totalChangePercent24hSignal()"
           ></app-summary-circle>
         </div>
@@ -59,7 +58,7 @@
               <h5 class="card-title mb-0">Data Management</h5>
             </div>
             <div class="card-body">
-              <app-csv-import (dataImported)="onDataImported($event)"></app-csv-import>
+              <app-csv-import (dataImported)="onDataImported($event)" (resetToDefault)="resetToDefaultHoldings()"></app-csv-import>
             </div>
           </div>
         </div>

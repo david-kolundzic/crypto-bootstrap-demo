@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TitleComponent } from "../../shared/title/title.component";
 
@@ -11,7 +11,7 @@ import { TitleComponent } from "../../shared/title/title.component";
   
 })
 export class MarketComponent {
-    titleSignal = signal<string>('Market Overview');
+    title = 'Market Overview';
     
     // Additional properties and methods for market functionality can be added here
 }
